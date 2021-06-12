@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Goal : GridObject
@@ -9,7 +7,7 @@ public class Goal : GridObject
         return true;
     }
 
-    public override void Push(Vector3 dir)
+    public override void Push(Vector3 dir, GridObject pusher)
     {
         // Win condition
     }

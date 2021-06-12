@@ -4,7 +4,9 @@ public class Girder : GridObject
 {
     public override bool CanMove(Vector3 direction)
     {
-        if(Physics.BoxCast(transform.position, transform.localScale * 0.48f, direction, transform.rotation, direction.magnitude))
+        var collider = GetComponent<BoxCollider>();
+
+        if(Physics.BoxCast(transform.position, collider.size * 0.48f, direction, transform.rotation, direction.magnitude))
         {
             return false;
         }

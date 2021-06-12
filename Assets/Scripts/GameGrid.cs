@@ -1,5 +1,7 @@
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 
 public abstract class GameGrid : MonoBehaviour
 {
@@ -7,6 +9,10 @@ public abstract class GameGrid : MonoBehaviour
     /// Bool used to delay turn ending by 1 frame
     /// </summary>
     public bool WillEndTurn = false;
+
+    public UnityEvent GameOver;
+
+    private bool GameIsOver;
 
     /// <summary>
     /// Get all grid objects inside this grid
@@ -21,6 +27,7 @@ public abstract class GameGrid : MonoBehaviour
         get
         {
             if (WillEndTurn) return false;
+            if (GameIsOver) return false;
 
             var allObjects = FindObjectsOfType<GridObject>();
 
@@ -45,6 +52,33 @@ public abstract class GameGrid : MonoBehaviour
 
             WillEndTurn = true;
         }
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        // Check for gameover state (player is gone)
+        if (GameIsOver) return;
+
+        if (!GridObjects.Any(o => o is Player))
+        {
+            DoGameOver();
+        }
+    }
+
+    /// <summary>
+    /// Set the game as over
+    /// </summary>
+    public void DoGameOver()
+    {
+        if (GameIsOver) return;
+
+        GameIsOver = true;
+        GameOver?.Invoke();
     }
 
     /// <summary>

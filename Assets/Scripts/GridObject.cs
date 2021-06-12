@@ -13,6 +13,8 @@ public abstract class GridObject : MonoBehaviour
     [Header("When this object leaves playable area")]
     public UnityEvent OnObjectDestroyed;
 
+    public UnityEvent OnMoveFinished;
+
     private Tweener currentTween;
 
     public bool IsMoving
@@ -32,6 +34,14 @@ public abstract class GridObject : MonoBehaviour
     {
         if (HasGravity) DoGravity();
 
+        OOBCheck();
+    }
+
+    /// <summary>
+    /// Check if this object is out of bounds
+    /// </summary>
+    public void OOBCheck()
+    {
         if (transform.position.y <= -7)
         {
             Debug.Log($"{name} left the world");
@@ -40,6 +50,9 @@ public abstract class GridObject : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Destroy this object
+    /// </summary>
     public virtual void Destroy()
     {
         if (IsMoving) currentTween.Complete();
@@ -52,7 +65,7 @@ public abstract class GridObject : MonoBehaviour
     /// Push this object in a direction
     /// </summary>
     /// <param name="dir"></param>
-    public virtual void Push(Vector3 dir)
+    public virtual void Push(Vector3 dir, GridObject pusher)
     {
         DoMove(dir);
     }
@@ -74,7 +87,7 @@ public abstract class GridObject : MonoBehaviour
     /// <summary>
     /// Does one iteration of gravity, moves down if possible
     /// </summary>
-    public void DoGravity()
+    public virtual void DoGravity()
     {
         if (CanMove(Vector3.down))
         {
@@ -82,13 +95,23 @@ public abstract class GridObject : MonoBehaviour
         }
     }
 
+
     /// <summary>
     /// Returns true if there are no colliders in the way of given movement
     /// </summary>
     /// <param name="direction"></param>
     /// <returns></returns>
-    public virtual bool CanMove(Vector3 direction)
+    public virtual bool CanMove(Vector3 direction) => CanMove(direction, out _);
+
+    /// <summary>
+    /// Returns true if there are no colliders in the way, also gives the object that is blocking the way
+    /// </summary>
+    /// <param name="direction"></param>
+    /// <param name="blocker"></param>
+    /// <returns></returns>
+    public virtual bool CanMove(Vector3 direction, out GridObject blocker)
     {
+        blocker = null;
         var ray = new Ray(transform.position, direction);
 
         if (Physics.Raycast(ray, out var hit, direction.magnitude))
@@ -98,11 +121,13 @@ public abstract class GridObject : MonoBehaviour
             // If there is an object in the way
             if (obj)
             {
+                blocker = obj;
+
                 // And object can move in this direction
                 if (obj.CanPush(direction))
                 {
                     // Push object and allow movement
-                    obj.Push(direction);
+                    obj.Push(direction, this);
                     return true;
                 }
             }
@@ -117,12 +142,18 @@ public abstract class GridObject : MonoBehaviour
     /// Moves this object by direction vector
     /// </summary>
     /// <param name="direction"></param>
-    public Tweener DoMove(Vector3 direction, float duration = 0.2f)
+    public void DoMove(Vector3 direction, float duration = 0.2f, bool callback = true)
     {
         if (IsMoving) currentTween.Complete();
 
         currentTween = transform.DOMove(transform.position + direction, duration);
+        currentTween.OnComplete(MoveFinished);
+    }
 
-        return currentTween;
+    protected virtual void MoveFinished()
+    {
+        if (HasGravity) DoGravity();
+
+        OOBCheck();
     }
 }

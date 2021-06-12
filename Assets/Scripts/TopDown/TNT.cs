@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -16,7 +14,7 @@ public class TNT : GridObject
         return true;
     }
 
-    public override void Push(Vector3 dir)
+    public override void Push(Vector3 dir, GridObject pusher)
     {
         // Find and destroy all cracked bricks
         var crackedBricks = FindObjectsOfType<CrackedBrick>();

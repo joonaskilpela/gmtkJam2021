@@ -1,5 +1,3 @@
-using DG.Tweening;
-
 public class Player : GridObject
 {
     public MoveDirection nextMove;
@@ -18,26 +16,24 @@ public class Player : GridObject
         }
     }
 
-    public Tweener ExecuteMove()
+    public void ExecuteMove(float length = 1f, float duration = 0.2f)
     {
-        Tweener tween = null;
-
         lastMove = nextMove;
 
         if (nextMove != MoveDirection.None)
         {
-            var dir = nextMove.ToVector3();
+            var dir = nextMove.ToVector3() * length;
 
-            if (CanMove(dir)) tween = DoMove(nextMove.ToVector3());
+            if (CanMove(dir)) DoMove(dir, duration);
         }
 
         nextMove = MoveDirection.None;
-
-        return tween;
     }
 
     public override void OnTurnEnd()
     {
         ExecuteMove();
+
+        OOBCheck();
     }
 }
