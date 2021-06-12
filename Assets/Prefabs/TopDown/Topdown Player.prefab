@@ -63,6 +63,10 @@ MonoBehaviour:
   OnObjectDestroyed:
     m_PersistentCalls:
       m_Calls: []
+  OnMoveFinished:
+    m_PersistentCalls:
+      m_Calls: []
+  quadRenderer: {fileID: 7264073952101612998}
   nextMove: 0
   lastMove: 0
 --- !u!1 &6837698078919943618

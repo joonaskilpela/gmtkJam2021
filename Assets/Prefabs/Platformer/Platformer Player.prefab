@@ -63,9 +63,14 @@ MonoBehaviour:
   OnObjectDestroyed:
     m_PersistentCalls:
       m_Calls: []
+  OnMoveFinished:
+    m_PersistentCalls:
+      m_Calls: []
+  quadRenderer: {fileID: 568447207762308842}
   nextMove: 0
   lastMove: 0
   maxJumps: 1
+  jumpHeight: 3
 --- !u!1 &6725895644248947942
 GameObject:
   m_ObjectHideFlags: 0

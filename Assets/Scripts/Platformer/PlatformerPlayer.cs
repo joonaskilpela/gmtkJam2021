@@ -7,14 +7,18 @@ public class PlatformerPlayer : Player
 
     private int jumps = 0;
 
-    private void Start()
+    protected override void Start()
     {
+        base.Start();
+
         jumps = maxJumps;
     }
 
     // Update is called once per frame
-    void Update()
+    protected override void Update()
     {
+        base.Update();
+
         if (Input.GetKey(KeyCode.UpArrow) && jumps > 0) SetNextMove(MoveDirection.Up);
         else if (Input.GetKey(KeyCode.RightArrow)) SetNextMove(MoveDirection.Right);
         //else if (Input.GetKey(KeyCode.DownArrow)) SetNextMove(MoveDirection.Down);
@@ -53,6 +57,8 @@ public class PlatformerPlayer : Player
             nextMove = MoveDirection.Up;
             if (ExecuteMove(i, 0.2f * i)) break;
         }
+
+        SetAnimationRow(2);
     }
 
     public override void DoGravity()
@@ -70,5 +76,7 @@ public class PlatformerPlayer : Player
         if (!CanMove(Vector3.down)) jumps = maxJumps;
 
         OOBCheck();
+
+        SetAnimationRow(0);
     }
 }

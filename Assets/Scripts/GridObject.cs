@@ -27,6 +27,16 @@ public abstract class GridObject : MonoBehaviour
         }
     }
 
+    protected virtual void Start()
+    {
+        
+    }
+
+    protected virtual void Update()
+    {
+
+    }
+
     /// <summary>
     /// Grid has just ended a turn
     /// </summary>
@@ -142,7 +152,7 @@ public abstract class GridObject : MonoBehaviour
     /// Moves this object by direction vector
     /// </summary>
     /// <param name="direction"></param>
-    public void DoMove(Vector3 direction, float duration = 0.2f, bool callback = true)
+    public virtual void DoMove(Vector3 direction, float duration = 0.2f, bool callback = true)
     {
         if (IsMoving) currentTween.Complete();
 

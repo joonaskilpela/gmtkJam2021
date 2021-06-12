@@ -2,9 +2,31 @@ using UnityEngine;
 
 public class Player : GridObject
 {
+    public Renderer quadRenderer;
     public MoveDirection nextMove;
     public MoveDirection lastMove;
 
+    private MaterialPropertyBlock block;
+
+    protected override void Start()
+    {
+        base.Start();
+
+        block = new MaterialPropertyBlock();
+        quadRenderer.GetPropertyBlock(block);
+        Debug.Log(block);
+    }
+
+    protected void SetAnimationRow(int row)
+    {
+        block.SetFloat("_Row", row);
+        quadRenderer.SetPropertyBlock(block);
+    }
+
+    /// <summary>
+    /// Set the move executed at the end of the turn
+    /// </summary>
+    /// <param name="dir"></param>
     public void SetNextMove(MoveDirection dir)
     {
         var grids = FindObjectsOfType<GameGrid>();
@@ -44,6 +66,13 @@ public class Player : GridObject
         return false;
     }
 
+    public override void DoMove(Vector3 direction, float duration = 0.2F, bool callback = true)
+    {
+        SetAnimationRow(1);
+
+        base.DoMove(direction, duration, callback);
+    }
+
     public override void OnTurnEnd()
     {
         ExecuteMove();
@@ -56,6 +85,8 @@ public class Player : GridObject
         base.MoveFinished();
 
         OverlapCheck();
+
+        SetAnimationRow(0);
     }
 
     /// <summary>
@@ -64,7 +95,7 @@ public class Player : GridObject
     public virtual void OverlapCheck()
     {
         // Check if player ended up overlapping with something
-        RaycastHit[] hits = Physics.BoxCastAll(transform.position, Vector3.one * 0.48f, Vector3.forward, transform.rotation, 1f);
+        RaycastHit[] hits = Physics.BoxCastAll(transform.position, Vector3.one * 0.4f, Vector3.forward, transform.rotation, 1f);
 
         foreach (var hit in hits)
         {

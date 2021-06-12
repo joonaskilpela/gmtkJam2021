@@ -6,8 +6,10 @@ public class AngryPot : GridObject
     private Vector3 direction = Vector3.left;
     private MaterialPropertyBlock block;
 
-    private void Start()
+    protected override void Start()
     {
+        base.Start();
+
         block = new MaterialPropertyBlock();
         potRenderer.GetPropertyBlock(block);
     }
