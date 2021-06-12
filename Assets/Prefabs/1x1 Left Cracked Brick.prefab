@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3135314693459171946}
   - component: {fileID: 6672703190223420489}
   m_Layer: 0
-  m_Name: Cracked Brick
+  m_Name: 1x1 Left Cracked Brick
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -25,7 +25,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3135314693459171948}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -1, y: -2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -61,6 +61,9 @@ MonoBehaviour:
   HasGravity: 0
   IsPushable: 0
   OnObjectDestroyed:
+    m_PersistentCalls:
+      m_Calls: []
+  OnMoveFinished:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &8235056770763249625
@@ -122,7 +125,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 640666d8ddd442c41900a0c4f6f1c568, type: 2}
+  - {fileID: 2100000, guid: 459d23ac1105ef04ca6be80049bc0886, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
