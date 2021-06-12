@@ -150,6 +150,9 @@ public abstract class GridObject : MonoBehaviour
         currentTween.OnComplete(MoveFinished);
     }
 
+    /// <summary>
+    /// Called when move tween completed
+    /// </summary>
     protected virtual void MoveFinished()
     {
         if (HasGravity) DoGravity();
