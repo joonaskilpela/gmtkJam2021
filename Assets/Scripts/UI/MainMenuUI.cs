@@ -11,7 +11,9 @@ public class MainMenuUI : MonoBehaviour
 
     public void QuitGame()
     {
+#if !UNITY_WEBGL
         // Quit the application
         Application.Quit();
+#endif
     }
 }
