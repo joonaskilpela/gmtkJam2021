@@ -12,6 +12,9 @@ public class AngryPot : GridObject
 
         block = new MaterialPropertyBlock();
         potRenderer.GetPropertyBlock(block);
+
+        block.SetVector("_BaseMap_ST", new Vector4(-direction.x, 1, 1, 1));
+        potRenderer.SetPropertyBlock(block);
     }
 
     public override void OnTurnEnd()
@@ -29,12 +32,12 @@ public class AngryPot : GridObject
                 return;
             }
 
-            block.SetVector("_BaseMap_ST", new Vector4(direction.x, 1, 1, 1));
-            potRenderer.SetPropertyBlock(block);
-            
             direction = direction * -1;
             DoMove(direction);
         }
+
+        block.SetVector("_BaseMap_ST", new Vector4(-direction.x, 1, 1, 1));
+        potRenderer.SetPropertyBlock(block);
 
         OOBCheck();
     }
