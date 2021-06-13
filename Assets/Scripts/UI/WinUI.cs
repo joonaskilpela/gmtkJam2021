@@ -33,6 +33,9 @@ public class WinUI : MonoBehaviour
 
         // Activate winpanel
         WinPanel.SetActive(true);
+
+        // Win sound
+        AudioPlayer.PlaySoundClip(AudioPlayer.SoundClip.Win);
     }
 
     public void LoadNextLevel()

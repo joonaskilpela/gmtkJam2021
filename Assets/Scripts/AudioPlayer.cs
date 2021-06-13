@@ -13,6 +13,7 @@ public class AudioPlayer : MonoBehaviour
     public AudioClip playerDie;
     public AudioClip explosion;
     public AudioClip jump;
+    public AudioClip win;
 
     private AudioSource _source;
 
@@ -21,7 +22,8 @@ public class AudioPlayer : MonoBehaviour
         FallCrash,
         PlayerDie,
         Explosion,
-        Jump
+        Jump,
+        Win
     }
 
     private void Start()
@@ -54,6 +56,9 @@ public class AudioPlayer : MonoBehaviour
                 break;
             case SoundClip.Jump:
                 _source.PlayOneShot(jump);
+                break;
+            case SoundClip.Win:
+                _source.PlayOneShot(win);
                 break;
             default:
                 Debug.Log($"Unknown sound clip {clip}");

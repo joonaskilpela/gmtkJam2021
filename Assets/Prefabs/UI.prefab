@@ -128,6 +128,7 @@ MonoBehaviour:
   playerDie: {fileID: 8300000, guid: cb5d94299e211e04f8616481e6b1fd80, type: 3}
   explosion: {fileID: 8300000, guid: 1284afbe50197db4c942ec7deee8ff09, type: 3}
   jump: {fileID: 8300000, guid: c3539a6468b907a43b63ea1121091c9c, type: 3}
+  win: {fileID: 8300000, guid: bfac6588690c56344b97acef55a507c5, type: 3}
 --- !u!1 &57481058356989407
 GameObject:
   m_ObjectHideFlags: 0

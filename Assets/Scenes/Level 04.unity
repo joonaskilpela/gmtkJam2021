@@ -4205,8 +4205,7 @@ PrefabInstance:
       value: 4x1 Solid Wall
       objectReference: {fileID: 0}
     m_RemovedComponents:
-    - {fileID: 112215088243830174, guid: a57198f959fa724489dca67ec5111bd2, type: 3}
-    - {fileID: 112215088243830175, guid: a57198f959fa724489dca67ec5111bd2, type: 3}
+    - {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: a57198f959fa724489dca67ec5111bd2, type: 3}
 --- !u!4 &1290624633 stripped
 Transform:
