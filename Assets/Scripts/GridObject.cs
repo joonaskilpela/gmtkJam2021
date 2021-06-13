@@ -64,16 +64,43 @@ public abstract class GridObject : MonoBehaviour
         {
             Debug.Log($"{name} left the world");
 
-            Destroy();
+            Destroy(DestroyedBy.Fall);
         }
+    }
+
+    public enum DestroyedBy
+    {
+        /// <summary>
+        /// Removed from game
+        /// </summary>
+        Removal,
+        /// <summary>
+        /// Fell out of the level
+        /// </summary>
+        Fall,
+        /// <summary>
+        /// Collision with enemy
+        /// </summary>
+        Enemy,
+        /// <summary>
+        /// Collision with spikes
+        /// </summary>
+        Spike,
+        /// <summary>
+        /// Overlap with crate/girder
+        /// </summary>
+        Crushed
     }
 
     /// <summary>
     /// Destroy this object
     /// </summary>
-    public virtual void Destroy()
+    public virtual void Destroy(DestroyedBy reason)
     {
-        if (IsMoving) currentTween.Complete();
+        //if (IsMoving) currentTween.Complete();
+
+        // Play falling sound
+        if(reason == DestroyedBy.Fall) AudioPlayer.PlaySoundClip(AudioPlayer.SoundClip.FallCrash);
 
         Destroy(gameObject);
         OnObjectDestroyed.Invoke();

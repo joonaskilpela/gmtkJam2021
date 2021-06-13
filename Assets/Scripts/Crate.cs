@@ -14,10 +14,10 @@ public class Crate : GridObject
             if (obj is SpikeTrap)
             {
                 // Destroy spiketrap
-                obj.Destroy();
+                obj.Destroy(DestroyedBy.Removal);
 
                 // Destroy crate
-                Destroy();
+                Destroy(DestroyedBy.Removal);
 
                 return true;
             }

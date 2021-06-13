@@ -21,8 +21,11 @@ public class AngryPot : GridObject
     {
         CheckAndMove();
 
-        block.SetVector("_BaseMap_ST", new Vector4(-direction.x, 1, 1, 1));
-        potRenderer.SetPropertyBlock(block);
+        if (block != null)
+        {
+            block.SetVector("_BaseMap_ST", new Vector4(-direction.x, 1, 1, 1));
+            potRenderer.SetPropertyBlock(block);
+        }
 
         OOBCheck();
     }
@@ -38,7 +41,7 @@ public class AngryPot : GridObject
         {
             if (blocker is Player)
             {
-                blocker.Destroy();
+                blocker.Destroy(DestroyedBy.Enemy);
                 DoMove(direction);
                 return;
             }

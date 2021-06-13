@@ -18,9 +18,16 @@ public class TNT : GridObject
     {
         // Find and destroy all cracked bricks
         var crackedBricks = FindObjectsOfType<CrackedBrick>();
-        foreach (var brick in crackedBricks) brick.Destroy();
+        foreach (var brick in crackedBricks) brick.Destroy(DestroyedBy.Removal);
 
         OnExplode?.Invoke();
-        Destroy();
+        Destroy(DestroyedBy.Removal);
+    }
+
+    public override void Destroy(DestroyedBy reason)
+    {
+        base.Destroy(reason);
+
+        AudioPlayer.PlaySoundClip(AudioPlayer.SoundClip.Explosion);
     }
 }

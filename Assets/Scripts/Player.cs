@@ -109,6 +109,15 @@ public class Player : GridObject
         SetAnimationRow(0);
     }
 
+    public override void Destroy(DestroyedBy reason)
+    {
+        base.Destroy(reason);
+
+        // Delay sound
+        if(reason == DestroyedBy.Fall) AudioPlayer.PlaySoundClip(AudioPlayer.SoundClip.PlayerDie, 0.9f);
+        else AudioPlayer.PlaySoundClip(AudioPlayer.SoundClip.PlayerDie);
+    }
+
     /// <summary>
     /// Check if player is overlapping with unwanted objects
     /// </summary>
@@ -122,11 +131,11 @@ public class Player : GridObject
             var obj = hit.collider.GetComponent<GridObject>();
 
             // Angry pots destroy the player
-            if (obj is AngryPot) Destroy();
+            if (obj is AngryPot) Destroy(DestroyedBy.Enemy);
             // Crates falling on the player is also lethal
-            else if (obj is Crate) Destroy();
+            else if (obj is Crate) Destroy(DestroyedBy.Crushed);
             // Girders falling on the player, also very deadly
-            else if (obj is Girder) Destroy();
+            else if (obj is Girder) Destroy(DestroyedBy.Crushed);
         }
     }
 }

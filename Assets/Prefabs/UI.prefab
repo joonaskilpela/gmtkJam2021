@@ -85,6 +85,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 57481058324003458}
+  - component: {fileID: 1819552468314109819}
   m_Layer: 0
   m_Name: UI
   m_TagString: Untagged
@@ -108,6 +109,21 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1819552468314109819
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 57481058324003459}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5608db3618b1a5945b1130430d838169, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fallCrash: {fileID: 8300000, guid: dd0f345571a31c04a8e8cbb55330b8d3, type: 3}
+  playerDie: {fileID: 8300000, guid: cb5d94299e211e04f8616481e6b1fd80, type: 3}
+  explosion: {fileID: 8300000, guid: 1284afbe50197db4c942ec7deee8ff09, type: 3}
 --- !u!1 &57481058356989407
 GameObject:
   m_ObjectHideFlags: 0

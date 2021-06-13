@@ -14,10 +14,10 @@ public class SpikeTrap : GridObject
         if (pusher is AngryPot) return;
 
         // Destroy the pushers
-        pusher.Destroy();
+        pusher.Destroy(DestroyedBy.Spike);
     }
 
-    public override void Destroy()
+    public override void Destroy(DestroyedBy reason)
     {
         OnObjectDestroyed.Invoke();
     }
