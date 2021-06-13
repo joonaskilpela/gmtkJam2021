@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3135314693459171946}
   - component: {fileID: 6672703190223420489}
   m_Layer: 0
-  m_Name: 1x1 Left Cracked Brick
+  m_Name: Right Cracked Brick
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -125,7 +125,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 459d23ac1105ef04ca6be80049bc0886, type: 2}
+  - {fileID: 2100000, guid: 729163622d7cce949857ebaff7be311e, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
