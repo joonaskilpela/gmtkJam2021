@@ -9328,19 +9328,19 @@ PrefabInstance:
     - target: {fileID: 57481058395181285, guid: 2253913cae9d4eb48846566054928d52,
         type: 3}
       propertyPath: m_text
-      value: 'WASD to move teacup
+      value: 'WASD to move T-Bag
 
-        ARROW KEYS to move joe
+        ARROW KEYS to move Joe
 
-        SPACE
-        to wait
+        SPACE to
+        wait
 
         R to reset'
       objectReference: {fileID: 0}
     - target: {fileID: 57481058395181285, guid: 2253913cae9d4eb48846566054928d52,
         type: 3}
       propertyPath: m_fontSize
-      value: 31.5
+      value: 39.55
       objectReference: {fileID: 0}
     - target: {fileID: 57481058395181285, guid: 2253913cae9d4eb48846566054928d52,
         type: 3}
@@ -9759,6 +9759,31 @@ PrefabInstance:
     - target: {fileID: 4033210862505709923, guid: 1c6287900eb8924488e0089f1c50d5ab,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6841825316337604818, guid: 1c6287900eb8924488e0089f1c50d5ab,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6841825316337604818, guid: 1c6287900eb8924488e0089f1c50d5ab,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6841825316337604818, guid: 1c6287900eb8924488e0089f1c50d5ab,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6841825316337604818, guid: 1c6287900eb8924488e0089f1c50d5ab,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6841825316337604818, guid: 1c6287900eb8924488e0089f1c50d5ab,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
