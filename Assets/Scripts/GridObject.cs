@@ -37,6 +37,14 @@ public abstract class GridObject : MonoBehaviour
 
     }
 
+    protected virtual void OnEnable()
+    {
+        // Check that newly spawned object doesnt overlap with a player
+        var players = FindObjectsOfType<Player>();
+
+        foreach (var player in players) player.OverlapCheck();
+    }
+
     /// <summary>
     /// Grid has just ended a turn
     /// </summary>

@@ -44,14 +44,6 @@ public abstract class GameGrid : MonoBehaviour
         }
     }
 
-    protected virtual void OnEnable()
-    {
-        // Check that newly spawned object doesnt overlap with a player
-        var players = FindObjectsOfType<Player>();
-
-        foreach (var player in players) player.OverlapCheck();
-    }
-
     // Update is called once per frame
     protected virtual void Update()
     {
