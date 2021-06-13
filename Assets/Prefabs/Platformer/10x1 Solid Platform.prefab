@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 5579169325951500795}
   - component: {fileID: 5579169325951500792}
   m_Layer: 0
-  m_Name: 1x Solid Platform 1
+  m_Name: 10x1 Solid Platform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
