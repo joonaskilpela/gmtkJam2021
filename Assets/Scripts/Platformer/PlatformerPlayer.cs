@@ -92,8 +92,10 @@ public class PlatformerPlayer : Player
         for (int i = jumpHeight; i > 0; i--)
         {
             nextMove = MoveDirection.Up;
-            if (ExecuteMove(i, 0.2f * i)) break;
+            if (ExecuteMove(i, 0.1f * i)) break;
         }
+
+        AudioPlayer.PlaySoundClip(AudioPlayer.SoundClip.Jump);
 
         SetAnimationRow(2);
     }
