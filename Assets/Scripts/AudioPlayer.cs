@@ -1,10 +1,13 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Audio;
 
 [RequireComponent(typeof(AudioSource))]
 public class AudioPlayer : MonoBehaviour
 {
     public static AudioPlayer _instance;
+
+    public AudioMixerGroup mixerGroup;
 
     public AudioClip fallCrash;
     public AudioClip playerDie;
@@ -23,6 +26,8 @@ public class AudioPlayer : MonoBehaviour
     {
         _instance = this;
         _source = GetComponent<AudioSource>();
+
+        _source.outputAudioMixerGroup = mixerGroup;
     }
 
     public static void PlaySoundClip(SoundClip clip, float delay = 0f)
