@@ -29,8 +29,18 @@ public class PlatformerPlayer : Player
     {
         base.ReachedFlag();
 
+        SetAnimationRow(3);
+
         // Set flag reached
         FindObjectOfType<PlatformerGrid>().FlagReached = true;
+    }
+
+    protected override void SetAnimationRow(int row)
+    {
+        // Force layer 3 (cheer) if flag has been reached
+        if (FindObjectOfType<PlatformerGrid>().FlagReached) row = 3;
+
+        base.SetAnimationRow(row);
     }
 
     public override void SetNextMove(MoveDirection dir)

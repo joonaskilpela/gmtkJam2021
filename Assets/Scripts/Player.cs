@@ -21,7 +21,7 @@ public class Player : GridObject
     /// Set the array animation row property
     /// </summary>
     /// <param name="row"></param>
-    protected void SetAnimationRow(int row)
+    protected virtual void SetAnimationRow(int row)
     {
         block.SetFloat("_Row", row);
         quadRenderer.SetPropertyBlock(block);

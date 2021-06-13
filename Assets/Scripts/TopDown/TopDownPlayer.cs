@@ -17,8 +17,17 @@ public class TopDownPlayer : Player
     {
         base.ReachedFlag();
 
+        SetAnimationRow(2);
+
         // Set flag reached
         FindObjectOfType<TopDownGrid>().FlagReached = true;
+    }
+
+    protected override void SetAnimationRow(int row)
+    {
+        // Force layer 2 (cheer) if flag has been reached
+        if (FindObjectOfType<TopDownGrid>().FlagReached) row = 2;
+        base.SetAnimationRow(row);
     }
 
     public override void SetNextMove(MoveDirection dir)
