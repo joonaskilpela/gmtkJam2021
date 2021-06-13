@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 
 public class Player : GridObject
@@ -6,7 +7,7 @@ public class Player : GridObject
     public MoveDirection nextMove;
     public MoveDirection lastMove;
 
-    private MaterialPropertyBlock block;
+    protected MaterialPropertyBlock block;
 
     protected override void Start()
     {
@@ -14,7 +15,6 @@ public class Player : GridObject
 
         block = new MaterialPropertyBlock();
         quadRenderer.GetPropertyBlock(block);
-        Debug.Log(block);
     }
 
     protected void SetAnimationRow(int row)
@@ -27,16 +27,24 @@ public class Player : GridObject
     /// Set the move executed at the end of the turn
     /// </summary>
     /// <param name="dir"></param>
-    public void SetNextMove(MoveDirection dir)
+    public virtual void SetNextMove(MoveDirection dir)
     {
+        // Find all grids
         var grids = FindObjectsOfType<GameGrid>();
+
+        // Make sure all grids are ready for turn end
+        if (grids.Any(g => !g.CanEndTurn)) return;
+
+        // Do nothing if player cannot move in the direction
+        if (!IsDirectionAllowed(dir.ToVector3(), out _)) return;
+
+        // Set next move
+        nextMove = dir;
+
+        // Make sure we can end turn now, and advance turn in each grid
         foreach (var grid in grids)
         {
-            if (grid.CanEndTurn)
-            {
-                nextMove = dir;
-                grid.WillEndTurn = true;
-            }
+            grid.WillEndTurn = true;
         }
     }
 

@@ -138,6 +138,41 @@ public abstract class GridObject : MonoBehaviour
                 {
                     // Push object and allow movement
                     obj.Push(direction, this);
+                    Debug.Log($"{obj.name} is pushed by {name}");
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Same as CanMove, but does not push objects
+    /// </summary>
+    /// <param name="direction"></param>
+    /// <param name="blocker"></param>
+    /// <returns></returns>
+    public virtual bool IsDirectionAllowed(Vector3 direction, out GridObject blocker)
+    {
+        blocker = null;
+        var ray = new Ray(transform.position, direction);
+
+        if (Physics.Raycast(ray, out var hit, direction.magnitude))
+        {
+            var obj = hit.collider.GetComponent<GridObject>();
+
+            // If there is an object in the way
+            if (obj)
+            {
+                blocker = obj;
+
+                // And object can move in this direction
+                if (obj.CanPush(direction))
+                {
+                    // Allow movement
                     return true;
                 }
             }

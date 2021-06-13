@@ -25,6 +25,29 @@ public class PlatformerPlayer : Player
         else if (Input.GetKey(KeyCode.LeftArrow)) SetNextMove(MoveDirection.Left);
     }
 
+    public override void SetNextMove(MoveDirection dir)
+    {
+        base.SetNextMove(dir);
+
+        switch (nextMove)
+        {
+            case MoveDirection.None:
+                break;
+            case MoveDirection.Up:
+                break;
+            case MoveDirection.Right:
+                block.SetVector("_Tiling", new Vector2(-1,1));
+                break;
+            case MoveDirection.Down:
+                break;
+            case MoveDirection.Left:
+                block.SetVector("_Tiling", new Vector2(1,1));
+                break;
+        }
+
+        quadRenderer.SetPropertyBlock(block);
+    }
+
     public override void OnTurnEnd()
     {
         if (nextMove == MoveDirection.None) nextMove = MoveDirection.Down;
@@ -71,7 +94,7 @@ public class PlatformerPlayer : Player
 
     protected override void MoveFinished()
     {
-        if (lastMove != MoveDirection.Up && lastMove != MoveDirection.Down) DoGravity();
+        if (lastMove != MoveDirection.Up) DoGravity();
 
         if (!CanMove(Vector3.down)) jumps = maxJumps;
 
