@@ -17,10 +17,22 @@ public class Player : GridObject
         quadRenderer.GetPropertyBlock(block);
     }
 
+    /// <summary>
+    /// Set the array animation row property
+    /// </summary>
+    /// <param name="row"></param>
     protected void SetAnimationRow(int row)
     {
         block.SetFloat("_Row", row);
         quadRenderer.SetPropertyBlock(block);
+    }
+
+    /// <summary>
+    /// Player has reached the flag
+    /// </summary>
+    public virtual void ReachedFlag()
+    {
+        Debug.Log($"{name} reached the flag");
     }
 
     /// <summary>

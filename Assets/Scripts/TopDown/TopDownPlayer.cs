@@ -13,9 +13,23 @@ public class TopDownPlayer : Player
         else if (Input.GetKey(KeyCode.A)) SetNextMove(MoveDirection.Left);
     }
 
+    public override void ReachedFlag()
+    {
+        base.ReachedFlag();
+
+        // Set flag reached
+        FindObjectOfType<TopDownGrid>().FlagReached = true;
+    }
+
     public override void SetNextMove(MoveDirection dir)
     {
         base.SetNextMove(dir);
+
+        if (nextMove != MoveDirection.None)
+        {
+            // Reset flag reached when player moves
+            FindObjectOfType<TopDownGrid>().FlagReached = false;
+        }
 
         switch (nextMove)
         {

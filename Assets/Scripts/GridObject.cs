@@ -138,7 +138,6 @@ public abstract class GridObject : MonoBehaviour
                 {
                     // Push object and allow movement
                     obj.Push(direction, this);
-                    Debug.Log($"{obj.name} is pushed by {name}");
                     return true;
                 }
             }

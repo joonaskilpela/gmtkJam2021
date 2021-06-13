@@ -12,6 +12,8 @@ public abstract class GameGrid : MonoBehaviour
 
     public UnityEvent GameOver;
 
+    public bool FlagReached;
+
     private bool GameIsOver;
 
     /// <summary>
@@ -28,6 +30,12 @@ public abstract class GameGrid : MonoBehaviour
         {
             if (WillEndTurn) return false;
             if (GameIsOver) return false;
+
+            // If all grids have reached win condition
+            var allGrids = FindObjectsOfType<GameGrid>();
+
+            // If there are no grids that have not reached the flag, disable turns
+            if (!allGrids.Any(g => !g.FlagReached)) return false;
 
             var allObjects = FindObjectsOfType<GridObject>();
 

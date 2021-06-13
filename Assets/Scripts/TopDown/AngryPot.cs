@@ -3,7 +3,7 @@ using UnityEngine;
 public class AngryPot : GridObject
 {
     public Renderer potRenderer;
-    private Vector3 direction = Vector3.left;
+    public Vector3 direction = Vector3.left;
     private MaterialPropertyBlock block;
 
     protected override void Start()

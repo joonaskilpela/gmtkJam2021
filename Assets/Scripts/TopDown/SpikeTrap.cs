@@ -10,6 +10,9 @@ public class SpikeTrap : GridObject
 
     public override void Push(Vector3 dir, GridObject pusher)
     {
+        // Pots are immune to spikes
+        if (pusher is AngryPot) return;
+
         // Destroy the pushers
         pusher.Destroy();
     }

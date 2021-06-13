@@ -25,9 +25,23 @@ public class PlatformerPlayer : Player
         else if (Input.GetKey(KeyCode.LeftArrow)) SetNextMove(MoveDirection.Left);
     }
 
+    public override void ReachedFlag()
+    {
+        base.ReachedFlag();
+
+        // Set flag reached
+        FindObjectOfType<PlatformerGrid>().FlagReached = true;
+    }
+
     public override void SetNextMove(MoveDirection dir)
     {
         base.SetNextMove(dir);
+
+        if (nextMove != MoveDirection.None)
+        {
+            // Reset flag reached when player moves
+            FindObjectOfType<PlatformerGrid>().FlagReached = false;
+        }
 
         switch (nextMove)
         {
@@ -36,12 +50,12 @@ public class PlatformerPlayer : Player
             case MoveDirection.Up:
                 break;
             case MoveDirection.Right:
-                block.SetVector("_Tiling", new Vector2(-1,1));
+                block.SetVector("_Tiling", new Vector2(-1, 1));
                 break;
             case MoveDirection.Down:
                 break;
             case MoveDirection.Left:
-                block.SetVector("_Tiling", new Vector2(1,1));
+                block.SetVector("_Tiling", new Vector2(1, 1));
                 break;
         }
 
