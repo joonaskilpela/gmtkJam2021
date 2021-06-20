@@ -3,6 +3,17 @@ using UnityEngine;
 
 public class TopDownPlayer : Player
 {
+    public override bool FlagReached { get => FindObjectOfType<TopDownGrid>().FlagReached; set => FindObjectOfType<TopDownGrid>().FlagReached = value; }
+
+    public override void RestoreState(GridObjectState state)
+    {
+        base.RestoreState(state);
+
+        var playerState = (PlayerState)state;
+
+        UpdateFacing(playerState.facingDirection);
+    }
+
     protected override void Update()
     {
         base.Update();
@@ -17,21 +28,29 @@ public class TopDownPlayer : Player
     {
         base.ReachedFlag();
 
+        SetAnimationRow(2);
+
         // Set flag reached
-        FindObjectOfType<TopDownGrid>().FlagReached = true;
+        FlagReached = true;
+    }
+
+    protected override void SetAnimationRow(int row)
+    {
+        // Force layer 2 (cheer) if flag has been reached
+        if (FlagReached) row = 2;
+        base.SetAnimationRow(row);
     }
 
     public override void SetNextMove(MoveDirection dir)
     {
         base.SetNextMove(dir);
 
-        if (nextMove != MoveDirection.None)
-        {
-            // Reset flag reached when player moves
-            FindObjectOfType<TopDownGrid>().FlagReached = false;
-        }
+        UpdateFacing(nextMove);
+    }
 
-        switch (nextMove)
+    private void UpdateFacing(MoveDirection dir)
+    {
+        switch (dir)
         {
             case MoveDirection.None:
                 break;
@@ -48,5 +67,12 @@ public class TopDownPlayer : Player
                 quadRenderer.transform.DORotateQuaternion(Quaternion.Euler(0, 0, 0), 0.1f);
                 break;
         }
+    }
+
+    protected override void MoveFinished()
+    {
+        FlagReached = false;
+
+        base.MoveFinished();
     }
 }

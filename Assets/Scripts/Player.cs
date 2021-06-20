@@ -3,9 +3,69 @@ using UnityEngine;
 
 public class Player : GridObject
 {
+    /// <summary>
+    /// State of the player object
+    /// </summary>
+    public class PlayerState : GridObjectState
+    {
+        public MoveDirection facingDirection;
+        public MoveDirection lastMove;
+        public MoveDirection nextMove;
+        public int animationRow;
+        public bool flagReached;
+
+        public override void CopyTo(GridObjectState other)
+        {
+            base.CopyTo(other);
+
+            if (other is PlayerState playerState)
+            {
+                playerState.facingDirection = facingDirection;
+                playerState.lastMove = lastMove;
+                playerState.nextMove = nextMove;
+                playerState.animationRow = animationRow;
+                playerState.flagReached = flagReached;
+            }
+        }
+    }
+
+    public override GridObjectState GetState()
+    {
+        // Base state
+        var state = new PlayerState();
+        base.GetState().CopyTo(state);
+
+        // Player properties
+        state.animationRow = GetAnimationRow();
+        state.facingDirection = lastMove;
+        state.lastMove = lastMove;
+        state.nextMove = nextMove;
+        state.flagReached = FlagReached;
+
+        return state;
+    }
+
+    public override void RestoreState(GridObjectState state)
+    {
+        // Base state
+        base.RestoreState(state);
+
+        // Player properties
+        PlayerState playerState = (PlayerState)state;
+
+        lastMove = playerState.lastMove;
+        FlagReached = playerState.flagReached;
+        SetAnimationRow(playerState.animationRow);
+
+        // Set nextmove to none to allow moving anywhere after restore
+        nextMove = MoveDirection.None;
+    }
+
     public Renderer quadRenderer;
     public MoveDirection nextMove;
     public MoveDirection lastMove;
+
+    public virtual bool FlagReached { get; set; }
 
     protected MaterialPropertyBlock block;
 
@@ -21,10 +81,19 @@ public class Player : GridObject
     /// Set the array animation row property
     /// </summary>
     /// <param name="row"></param>
-    protected void SetAnimationRow(int row)
+    protected virtual void SetAnimationRow(int row)
     {
         block.SetFloat("_Row", row);
         quadRenderer.SetPropertyBlock(block);
+    }
+
+    /// <summary>
+    /// Get the array animation row property
+    /// </summary>
+    /// <returns></returns>
+    protected virtual int GetAnimationRow()
+    {
+        return (int)block.GetFloat("_Row");
     }
 
     /// <summary>
@@ -58,6 +127,21 @@ public class Player : GridObject
         {
             grid.WillEndTurn = true;
         }
+    }
+
+    /// <summary>
+    /// Will the player escape an enemy collision
+    /// </summary>
+    /// <param name="angryPot"></param>
+    /// <param name="direction"></param>
+    /// <returns></returns>
+    public bool WillEscapeEnemy(AngryPot angryPot, MoveDirection direction)
+    {
+        // Judge by lastMove because the move should already be processed
+        // If not moving anywhere
+        if (lastMove == MoveDirection.None) return false;
+
+        return true;
     }
 
     /// <summary>
@@ -109,24 +193,39 @@ public class Player : GridObject
         SetAnimationRow(0);
     }
 
+    public override void Destroy(DestroyedBy reason)
+    {
+        base.Destroy(reason);
+
+        // Delay sound
+        if (reason == DestroyedBy.Fall) AudioPlayer.PlaySoundClip(AudioPlayer.SoundClip.PlayerDie, 0.9f);
+        else AudioPlayer.PlaySoundClip(AudioPlayer.SoundClip.PlayerDie);
+    }
+
     /// <summary>
-    /// Check if player is overlapping with unwanted objects
+    /// Check if player is overlapping with objects
     /// </summary>
     public virtual void OverlapCheck()
     {
+        if (!gameObject.activeSelf) return;
+
         // Check if player ended up overlapping with something
-        RaycastHit[] hits = Physics.BoxCastAll(transform.position, Vector3.one * 0.4f, Vector3.forward, transform.rotation, 1f);
+        RaycastHit[] hits = Physics.BoxCastAll(transform.position, Vector3.one * 0.1f, Vector3.forward, transform.rotation, 1f);
 
         foreach (var hit in hits)
         {
             var obj = hit.collider.GetComponent<GridObject>();
 
             // Angry pots destroy the player
-            if (obj is AngryPot) Destroy();
+            if (obj is AngryPot) Destroy(DestroyedBy.Enemy);
             // Crates falling on the player is also lethal
-            else if (obj is Crate) Destroy();
+            else if (obj is Crate) Destroy(DestroyedBy.Crushed);
             // Girders falling on the player, also very deadly
-            else if (obj is Girder) Destroy();
+            else if (obj is Girder) Destroy(DestroyedBy.Crushed);
+            // Spikes, very sharp and deadly
+            else if (obj is SpikeTrap) Destroy(DestroyedBy.Spike);
+            // Goals are for winning
+            else if (obj is Goal) ReachedFlag();
         }
     }
 }

@@ -2,6 +2,18 @@ using UnityEngine;
 
 public class Crate : GridObject
 {
+    private bool destroyAfterMove = false;
+    private SpikeTrap destroySpikeAfterMove = null;
+
+    public override void RestoreState(GridObjectState state)
+    {
+        base.RestoreState(state);
+
+        // Set destroy after move to false when state was rewinded
+        destroyAfterMove = false;
+        destroySpikeAfterMove = null;
+    }
+
     public override bool CanMove(Vector3 direction)
     {
         var ray = new Ray(transform.position, direction);
@@ -11,13 +23,10 @@ public class Crate : GridObject
             var obj = hit.collider.GetComponent<GridObject>();
 
             // If there was an object, and object was spiketrap
-            if (obj is SpikeTrap)
+            if (obj is SpikeTrap spike)
             {
-                // Destroy spiketrap
-                obj.Destroy();
-
-                // Destroy crate
-                Destroy();
+                destroyAfterMove = true;
+                destroySpikeAfterMove = spike;
 
                 return true;
             }
@@ -26,5 +35,19 @@ public class Crate : GridObject
         }
 
         return true;
+    }
+
+    protected override void MoveFinished()
+    {
+        base.MoveFinished();
+
+        if (destroyAfterMove)
+        {
+            // Destroy spiketrap
+            destroySpikeAfterMove.Destroy(DestroyedBy.Removal);
+
+            // Destroy crate
+            Destroy(DestroyedBy.Removal);
+        }
     }
 }

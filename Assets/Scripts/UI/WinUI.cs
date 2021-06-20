@@ -13,16 +13,32 @@ public class WinUI : MonoBehaviour
         grids = FindObjectsOfType<GameGrid>();
     }
 
+    private void Update()
+    {
+        // If win panel is active
+        if (WinPanel.activeSelf)
+        {
+            // Load next level if space is pressed
+            if (Input.GetKeyDown(KeyCode.Space)) LoadNextLevel();
+        }
+    }
+
     private void FixedUpdate()
     {
-        // If winpanel is not active
+        // If winpanel is active, dont continue to check grids
         if (WinPanel.activeSelf) return;
 
         // Check that all grids have reached the flag
         if (grids.Any(g => !g.FlagReached)) return;
 
+        // Clear all rewind stacks
+        foreach (var grid in grids) grid.previousStateStack.Clear();
+
         // Activate winpanel
         WinPanel.SetActive(true);
+
+        // Win sound
+        AudioPlayer.PlaySoundClip(AudioPlayer.SoundClip.Win);
     }
 
     public void LoadNextLevel()

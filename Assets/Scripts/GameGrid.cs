@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
@@ -11,15 +13,24 @@ public abstract class GameGrid : MonoBehaviour
     public bool WillEndTurn = false;
 
     public UnityEvent GameOver;
+    public UnityEvent GameOverRewind;
 
-    public bool FlagReached;
+    public bool FlagReached = false;
 
     private bool GameIsOver;
+    private bool TurnEnding;
+
+    /// <summary>
+    /// List of stored grid object states, for rewind mechanic
+    /// </summary>
+    public Stack<List<GridObjectState>> previousStateStack = new Stack<List<GridObjectState>>();
 
     /// <summary>
     /// Get all grid objects inside this grid
     /// </summary>
     public GridObject[] GridObjects => gameObject.GetComponentsInChildren<GridObject>();
+    
+    public GridObject[] GridObjectsIncludingDisabled => gameObject.GetComponentsInChildren<GridObject>(true);
 
     /// <summary>
     /// Can the grid end turn next frame
@@ -30,6 +41,7 @@ public abstract class GameGrid : MonoBehaviour
         {
             if (WillEndTurn) return false;
             if (GameIsOver) return false;
+            if (TurnEnding) return false;
 
             // If all grids have reached win condition
             var allGrids = FindObjectsOfType<GameGrid>();
@@ -49,7 +61,7 @@ public abstract class GameGrid : MonoBehaviour
     {
         if (WillEndTurn)
         {
-            EndTurn();
+            StartCoroutine(EndTurn());
             WillEndTurn = false;
         }
 
@@ -64,6 +76,11 @@ public abstract class GameGrid : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.R))
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Backspace))
+        {
+            StartCoroutine(RewindState());
         }
     }
 
@@ -85,19 +102,73 @@ public abstract class GameGrid : MonoBehaviour
     {
         if (GameIsOver) return;
 
+        Debug.Log($"{name} Game is Over");
+
         GameIsOver = true;
         GameOver?.Invoke();
+    }
+
+    public IEnumerator RewindState()
+    {
+        // If stack is empty, dont try to restore state
+        if (previousStateStack.Count == 0) yield break;
+
+        // Get the latest state
+        var states = previousStateStack.Pop();
+
+        // If there were no previous states
+        if (states == null) yield break;
+
+        // Restore all states
+        foreach (var state in states)
+        {
+            state.Restore();
+        }
+
+        yield return new WaitForFixedUpdate();
+
+        foreach (var state in states)
+        {
+            state.RestoreActive();
+        }
+
+        // Remove gameover after rewind
+        if (GameIsOver)
+        {
+            GameIsOver = false;
+            GameOverRewind?.Invoke();
+        }
+
     }
 
     /// <summary>
     /// Process enemies, gravity etc
     /// </summary>
-    public virtual void EndTurn()
+    public virtual IEnumerator EndTurn()
     {
         Debug.Log($"{name}: Turn ending");
-        foreach (var obj in GridObjects)
+
+        TurnEnding = true;
+
+        // Store state from all objects, including disabled
+        previousStateStack.Push(GridObjectsIncludingDisabled.Select(o => o.GetState()).ToList());
+
+        yield return new WaitForEndOfFrame();
+
+        var objects = GridObjects;
+
+        // Do players first
+        foreach (var obj in objects.Where(o => o is Player))
         {
             obj.OnTurnEnd();
         }
+
+        // Do non players
+        foreach (var obj in objects.Where(o => !(o is Player)))
+        {
+            obj.OnTurnEnd();
+        }
+
+        TurnEnding = false;
     }
 }

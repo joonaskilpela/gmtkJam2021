@@ -3642,9 +3642,7 @@ PrefabInstance:
       propertyPath: m_Name
       value: 4x1 Solid Wall
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 112215088243830174, guid: a57198f959fa724489dca67ec5111bd2, type: 3}
-    - {fileID: 112215088243830175, guid: a57198f959fa724489dca67ec5111bd2, type: 3}
+    m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a57198f959fa724489dca67ec5111bd2, type: 3}
 --- !u!4 &1290624633 stripped
 Transform:
@@ -7377,31 +7375,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: UI
       objectReference: {fileID: 0}
-    - target: {fileID: 57481058324003459, guid: 2253913cae9d4eb48846566054928d52,
+    - target: {fileID: 333717963763259922, guid: 2253913cae9d4eb48846566054928d52,
         type: 3}
-      propertyPath: m_IsActive
-      value: 1
+      propertyPath: m_RootOrder
+      value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 57481058395181285, guid: 2253913cae9d4eb48846566054928d52,
+    - target: {fileID: 3370044886471537383, guid: 2253913cae9d4eb48846566054928d52,
         type: 3}
-      propertyPath: m_text
-      value: 'WASD to move T-Bag
-
-        ARROW KEYS to move Joe
-
-        SPACE to
-        wait
-
-        R to reset'
-      objectReference: {fileID: 0}
-    - target: {fileID: 57481058395181285, guid: 2253913cae9d4eb48846566054928d52,
-        type: 3}
-      propertyPath: m_fontSize
-      value: 39.55
-      objectReference: {fileID: 0}
-    - target: {fileID: 57481058395181285, guid: 2253913cae9d4eb48846566054928d52,
-        type: 3}
-      propertyPath: m_enableAutoSizing
+      propertyPath: m_RootOrder
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []

@@ -2,10 +2,45 @@ using UnityEngine;
 
 public class PlatformerPlayer : Player
 {
+    /// <summary>
+    /// State of the player object
+    /// </summary>
+    public class PlatformerPlayerState : PlayerState
+    {
+        public int jumps;
+    }
+
+    public override GridObjectState GetState()
+    {
+        // Base state
+        var state = new PlatformerPlayerState();
+        base.GetState().CopyTo(state);
+
+        // Player properties
+        state.jumps = jumps;
+
+        return state;
+    }
+
+    public override void RestoreState(GridObjectState state)
+    {
+        // Base state
+        base.RestoreState(state);
+
+        // Player properties
+        var playerState = (PlatformerPlayerState)state;
+
+        UpdateFacing(playerState.facingDirection);
+
+        jumps = playerState.jumps;
+    }
+
     public int maxJumps = 2;
     public int jumpHeight = 3;
 
     private int jumps = 0;
+
+    public override bool FlagReached { get => FindObjectOfType<PlatformerGrid>().FlagReached; set => FindObjectOfType<PlatformerGrid>().FlagReached = value; }
 
     protected override void Start()
     {
@@ -29,21 +64,23 @@ public class PlatformerPlayer : Player
     {
         base.ReachedFlag();
 
+        SetAnimationRow(3);
+
         // Set flag reached
-        FindObjectOfType<PlatformerGrid>().FlagReached = true;
+        FlagReached = true;
     }
 
-    public override void SetNextMove(MoveDirection dir)
+    protected override void SetAnimationRow(int row)
     {
-        base.SetNextMove(dir);
+        // Force layer 3 (cheer) if flag has been reached
+        if (FlagReached) row = 3;
 
-        if (nextMove != MoveDirection.None)
-        {
-            // Reset flag reached when player moves
-            FindObjectOfType<PlatformerGrid>().FlagReached = false;
-        }
+        base.SetAnimationRow(row);
+    }
 
-        switch (nextMove)
+    private void UpdateFacing(MoveDirection dir)
+    {
+        switch (dir)
         {
             case MoveDirection.None:
                 break;
@@ -58,13 +95,22 @@ public class PlatformerPlayer : Player
                 block.SetVector("_Tiling", new Vector2(1, 1));
                 break;
         }
+    }
+
+    public override void SetNextMove(MoveDirection dir)
+    {
+        base.SetNextMove(dir);
+
+        UpdateFacing(nextMove);
 
         quadRenderer.SetPropertyBlock(block);
     }
 
     public override void OnTurnEnd()
     {
-        if (nextMove == MoveDirection.None) nextMove = MoveDirection.Down;
+        SetAnimationRow(0);
+
+        if (nextMove == MoveDirection.None) DoGravity();
 
         // If player is jumping
         if (nextMove == MoveDirection.Up)
@@ -92,27 +138,24 @@ public class PlatformerPlayer : Player
         for (int i = jumpHeight; i > 0; i--)
         {
             nextMove = MoveDirection.Up;
-            if (ExecuteMove(i, 0.2f * i)) break;
+            if (ExecuteMove(i, 0.1f * i)) break;
         }
+
+        AudioPlayer.PlaySoundClip(AudioPlayer.SoundClip.Jump);
 
         SetAnimationRow(2);
-    }
-
-    public override void DoGravity()
-    {
-        if (CanMove(Vector3.down))
-        {
-            DoMove(Vector3.down);
-        }
     }
 
     protected override void MoveFinished()
     {
         if (lastMove != MoveDirection.Up) DoGravity();
 
-        if (!CanMove(Vector3.down)) jumps = maxJumps;
+        if (!IsDirectionAllowed(Vector3.down)) jumps = maxJumps;
+
+        FlagReached = false;
 
         OOBCheck();
+        OverlapCheck();
 
         SetAnimationRow(0);
     }
