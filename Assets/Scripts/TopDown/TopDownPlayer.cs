@@ -45,12 +45,6 @@ public class TopDownPlayer : Player
     {
         base.SetNextMove(dir);
 
-        if (nextMove != MoveDirection.None)
-        {
-            // Reset flag reached when player moves
-            FlagReached = false;
-        }
-
         UpdateFacing(nextMove);
     }
 
@@ -73,5 +67,12 @@ public class TopDownPlayer : Player
                 quadRenderer.transform.DORotateQuaternion(Quaternion.Euler(0, 0, 0), 0.1f);
                 break;
         }
+    }
+
+    protected override void MoveFinished()
+    {
+        FlagReached = false;
+
+        base.MoveFinished();
     }
 }

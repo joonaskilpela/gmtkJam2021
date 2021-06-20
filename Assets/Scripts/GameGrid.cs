@@ -18,6 +18,7 @@ public abstract class GameGrid : MonoBehaviour
     public bool FlagReached = false;
 
     private bool GameIsOver;
+    private bool TurnEnding;
 
     /// <summary>
     /// List of stored grid object states, for rewind mechanic
@@ -28,6 +29,8 @@ public abstract class GameGrid : MonoBehaviour
     /// Get all grid objects inside this grid
     /// </summary>
     public GridObject[] GridObjects => gameObject.GetComponentsInChildren<GridObject>();
+    
+    public GridObject[] GridObjectsIncludingDisabled => gameObject.GetComponentsInChildren<GridObject>(true);
 
     /// <summary>
     /// Can the grid end turn next frame
@@ -38,6 +41,7 @@ public abstract class GameGrid : MonoBehaviour
         {
             if (WillEndTurn) return false;
             if (GameIsOver) return false;
+            if (TurnEnding) return false;
 
             // If all grids have reached win condition
             var allGrids = FindObjectsOfType<GameGrid>();
@@ -57,7 +61,7 @@ public abstract class GameGrid : MonoBehaviour
     {
         if (WillEndTurn)
         {
-            EndTurn();
+            StartCoroutine(EndTurn());
             WillEndTurn = false;
         }
 
@@ -140,13 +144,18 @@ public abstract class GameGrid : MonoBehaviour
     /// <summary>
     /// Process enemies, gravity etc
     /// </summary>
-    public virtual void EndTurn()
+    public virtual IEnumerator EndTurn()
     {
         Debug.Log($"{name}: Turn ending");
 
-        var objects = GridObjects;
+        TurnEnding = true;
 
-        previousStateStack.Push(objects.Select(o => o.GetState()).ToList());
+        // Store state from all objects, including disabled
+        previousStateStack.Push(GridObjectsIncludingDisabled.Select(o => o.GetState()).ToList());
+
+        yield return new WaitForEndOfFrame();
+
+        var objects = GridObjects;
 
         // Do players first
         foreach (var obj in objects.Where(o => o is Player))
@@ -159,5 +168,7 @@ public abstract class GameGrid : MonoBehaviour
         {
             obj.OnTurnEnd();
         }
+
+        TurnEnding = false;
     }
 }

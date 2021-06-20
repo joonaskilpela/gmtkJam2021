@@ -98,4 +98,25 @@ public class AngryPot : GridObject
             return;
         }
     }
+
+    public override bool IsMovingOutOfWay(GridObject other, MoveDirection moveDirection)
+    {
+        // If pot is not moving
+        if (direction == MoveDirection.None) return false;
+
+        // If its a head-on collision
+        if (direction.Opposite() == moveDirection) return false;
+
+        // If pot is changing direction
+        if(!IsDirectionAllowed(direction.ToVector3()))
+        {
+            // If move was in the same direction (towards the obstacle that we are going to change direction on)
+            if (direction == moveDirection) return false;
+        }
+
+        // If other has gravity, and is above (riding)
+        if (other.HasGravity && other.transform.position.y > transform.position.y) return false;
+
+        return true;
+    }
 }

@@ -203,14 +203,14 @@ public class Player : GridObject
     }
 
     /// <summary>
-    /// Check if player is overlapping with unwanted objects
+    /// Check if player is overlapping with objects
     /// </summary>
     public virtual void OverlapCheck()
     {
         if (!gameObject.activeSelf) return;
 
         // Check if player ended up overlapping with something
-        RaycastHit[] hits = Physics.BoxCastAll(transform.position, Vector3.one * 0.4f, Vector3.forward, transform.rotation, 1f);
+        RaycastHit[] hits = Physics.BoxCastAll(transform.position, Vector3.one * 0.1f, Vector3.forward, transform.rotation, 1f);
 
         foreach (var hit in hits)
         {
@@ -222,6 +222,8 @@ public class Player : GridObject
             else if (obj is Crate) Destroy(DestroyedBy.Crushed);
             // Girders falling on the player, also very deadly
             else if (obj is Girder) Destroy(DestroyedBy.Crushed);
+            // Spikes, very sharp and deadly
+            else if (obj is SpikeTrap) Destroy(DestroyedBy.Spike);
             // Goals are for winning
             else if (obj is Goal) ReachedFlag();
         }

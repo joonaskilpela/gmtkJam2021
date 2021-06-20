@@ -1,5 +1,6 @@
 using DG.Tweening;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -149,6 +150,10 @@ public abstract class GridObject : MonoBehaviour
 
         // First set position to avoid overlap check in OnEnable
         transform.position = state.position;
+
+        // If this gameobject needs to deactivate, do it in the restore step, before other object activate
+        // To give colliders time to realise they dont overlap with this
+        if (gameObject.activeSelf && !state.active) gameObject.SetActive(false);
     }
 
     /// <summary>
@@ -178,12 +183,18 @@ public abstract class GridObject : MonoBehaviour
 
         // Calculate maximum fall height to do it all in a single move
         int fallLength;
-
         for (fallLength = 1; fallLength < 10; fallLength++)
         {
-            if (!IsDirectionAllowed(Vector3.down * fallLength))
+            if (!IsDirectionAllowed(Vector3.down * fallLength, out List<GridObject> blockers))
             {
                 fallLength--;
+                break;
+            }
+
+            // If we ran into any spikes
+            if (blockers.Any(o => o is SpikeTrap))
+            {
+                // Stop fall short here
                 break;
             }
         }
@@ -233,8 +244,8 @@ public abstract class GridObject : MonoBehaviour
                     }
                     else
                     {
-                        // If object cannot be pushed, dont allow moving here
-                        canmove = false;
+                        // If object cannot be pushed, check if its moving out of the way
+                        if (!obj.IsMovingOutOfWay(this, direction.ToMoveDirection())) canmove = false;
                     }
                 }
                 else
@@ -283,8 +294,8 @@ public abstract class GridObject : MonoBehaviour
                     }
                     else
                     {
-                        // If object cannot be pushed, dont allow moving here
-                        canmove = false;
+                        // If object cannot be pushed, check if its moving out of the way
+                        if(!obj.IsMovingOutOfWay(this, direction.ToMoveDirection())) canmove = false;
                     }
                 }
                 else
@@ -296,6 +307,16 @@ public abstract class GridObject : MonoBehaviour
         }
 
         return canmove;
+    }
+
+    /// <summary>
+    /// Returns true if the object is going to move out of the way, called when something is trying to move into this object
+    /// </summary>
+    /// <param name="moveDirection"></param>
+    /// <returns></returns>
+    public virtual bool IsMovingOutOfWay(GridObject other, MoveDirection moveDirection)
+    {
+        return false;
     }
 
     /// <summary>
