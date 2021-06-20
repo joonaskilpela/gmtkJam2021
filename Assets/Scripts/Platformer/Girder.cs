@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Girder : GridObject
@@ -12,6 +13,13 @@ public class Girder : GridObject
         }
 
         return true;
+    }
+
+    public override bool IsDirectionAllowed(Vector3 direction, out List<GridObject> blockers)
+    {
+        blockers = new List<GridObject>();
+
+        return IsDirectionAllowed(direction);
     }
 
     public override bool IsDirectionAllowed(Vector3 direction)
