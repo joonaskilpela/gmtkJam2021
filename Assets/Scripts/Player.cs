@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using UnityEngine;
 
@@ -58,6 +59,21 @@ public class Player : GridObject
         {
             grid.WillEndTurn = true;
         }
+    }
+
+    /// <summary>
+    /// Will the player escape an enemy collision
+    /// </summary>
+    /// <param name="angryPot"></param>
+    /// <param name="direction"></param>
+    /// <returns></returns>
+    public bool WillEscapeEnemy(AngryPot angryPot, MoveDirection direction)
+    {
+        // Judge by lastMove because the move should already be processed
+        // If not moving anywhere
+        if (lastMove == MoveDirection.None) return false;
+
+        return true;
     }
 
     /// <summary>

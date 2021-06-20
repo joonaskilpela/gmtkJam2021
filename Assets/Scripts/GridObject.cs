@@ -1,4 +1,5 @@
 using DG.Tweening;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -29,7 +30,7 @@ public abstract class GridObject : MonoBehaviour
 
     protected virtual void Start()
     {
-        
+
     }
 
     protected virtual void Update()
@@ -149,38 +150,52 @@ public abstract class GridObject : MonoBehaviour
     public virtual bool CanMove(Vector3 direction) => CanMove(direction, out _);
 
     /// <summary>
-    /// Returns true if there are no colliders in the way, also gives the object that is blocking the way
+    /// Returns true if there are no colliders in the way, also gives the objects that are blocking the way (in the same cell)
     /// </summary>
     /// <param name="direction"></param>
-    /// <param name="blocker"></param>
+    /// <param name="blockers"></param>
     /// <returns></returns>
-    public virtual bool CanMove(Vector3 direction, out GridObject blocker)
+    public virtual bool CanMove(Vector3 direction, out List<GridObject> blockers)
     {
-        blocker = null;
+        blockers = new List<GridObject>();
+
         var ray = new Ray(transform.position, direction);
+        var hits = Physics.RaycastAll(ray, direction.magnitude);
 
-        if (Physics.Raycast(ray, out var hit, direction.magnitude))
+        var canmove = true;
+
+        if (hits.Length > 0)
         {
-            var obj = hit.collider.GetComponent<GridObject>();
-
-            // If there is an object in the way
-            if (obj)
+            foreach (var hit in hits)
             {
-                blocker = obj;
+                var obj = hit.collider.GetComponent<GridObject>();
 
-                // And object can move in this direction
-                if (obj.CanPush(direction))
+                // If there is an object in the way
+                if (obj)
                 {
-                    // Push object and allow movement
-                    obj.Push(direction, this);
-                    return true;
+                    blockers.Add(obj);
+
+                    // And object can move in this direction
+                    if (obj.CanPush(direction))
+                    {
+                        // Push object and allow movement
+                        obj.Push(direction, this);
+                    }
+                    else
+                    {
+                        // If object cannot be pushed, dont allow moving here
+                        canmove = false;
+                    }
+                }
+                else
+                {
+                    // Collider wasnt a grid object, it always blocks movement (outer walls etc)
+                    canmove = false;
                 }
             }
-
-            return false;
         }
 
-        return true;
+        return canmove;
     }
 
     /// <summary>

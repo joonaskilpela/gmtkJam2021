@@ -74,7 +74,7 @@ public class PlatformerPlayer : Player
 
     public override void OnTurnEnd()
     {
-        if (nextMove == MoveDirection.None) nextMove = MoveDirection.Down;
+        if (nextMove == MoveDirection.None && CanMove(Vector3.down)) nextMove = MoveDirection.Down;
 
         // If player is jumping
         if (nextMove == MoveDirection.Up)
@@ -125,6 +125,7 @@ public class PlatformerPlayer : Player
         if (!CanMove(Vector3.down)) jumps = maxJumps;
 
         OOBCheck();
+        OverlapCheck();
 
         SetAnimationRow(0);
     }

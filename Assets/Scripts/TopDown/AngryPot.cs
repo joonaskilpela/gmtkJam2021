@@ -1,9 +1,10 @@
+using System.Linq;
 using UnityEngine;
 
 public class AngryPot : GridObject
 {
     public Renderer potRenderer;
-    public Vector3 direction = Vector3.left;
+    public MoveDirection direction = MoveDirection.Left;
     private MaterialPropertyBlock block;
 
     protected override void Start()
@@ -13,7 +14,7 @@ public class AngryPot : GridObject
         block = new MaterialPropertyBlock();
         potRenderer.GetPropertyBlock(block);
 
-        block.SetVector("_BaseMap_ST", new Vector4(-direction.x, 1, 1, 1));
+        block.SetVector("_BaseMap_ST", new Vector4(-direction.ToVector3().x, 1, 1, 1));
         potRenderer.SetPropertyBlock(block);
     }
 
@@ -23,7 +24,7 @@ public class AngryPot : GridObject
 
         if (block != null)
         {
-            block.SetVector("_BaseMap_ST", new Vector4(-direction.x, 1, 1, 1));
+            block.SetVector("_BaseMap_ST", new Vector4(-direction.ToVector3().x, 1, 1, 1));
             potRenderer.SetPropertyBlock(block);
         }
 
@@ -32,21 +33,29 @@ public class AngryPot : GridObject
 
     private void CheckAndMove()
     {
-        if (CanMove(direction, out var blocker))
+        Vector3 dir = direction.ToVector3();
+
+        if (CanMove(dir, out var blockers))
         {
-            DoMove(direction);
+            DoMove(dir);
             return;
         }
         else
         {
-            if (blocker is Player)
+            // If there was a player blocking
+            if (blockers.Any(o => o is Player))
             {
-                blocker.Destroy(DestroyedBy.Enemy);
-                DoMove(direction);
+                // Pick out the player
+                Player player = (Player)blockers.First(o => o is Player);
+
+                // Destroy player if theyre not escaping
+                if (!player.WillEscapeEnemy(this, direction)) player.Destroy(DestroyedBy.Enemy);
+
+                DoMove(dir);
                 return;
             }
 
-            direction = direction * -1;
+            direction = direction.Opposite();
             CheckAndMove();
 
             return;
