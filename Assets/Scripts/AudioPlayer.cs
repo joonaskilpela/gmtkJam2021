@@ -36,7 +36,8 @@ public class AudioPlayer : MonoBehaviour
 
     public static void PlaySoundClip(SoundClip clip, float delay = 0f)
     {
-        _instance?.StartCoroutine(_instance.PlaySound(clip, delay));
+        if (_instance == null) return;
+        _instance.StartCoroutine(_instance.PlaySound(clip, delay));
     }
 
     public IEnumerator PlaySound(SoundClip clip, float delay)

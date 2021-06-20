@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
@@ -11,10 +13,16 @@ public abstract class GameGrid : MonoBehaviour
     public bool WillEndTurn = false;
 
     public UnityEvent GameOver;
+    public UnityEvent GameOverRewind;
 
-    public bool FlagReached;
+    public bool FlagReached = false;
 
     private bool GameIsOver;
+
+    /// <summary>
+    /// List of stored grid object states, for rewind mechanic
+    /// </summary>
+    public Stack<List<GridObjectState>> previousStateStack = new Stack<List<GridObjectState>>();
 
     /// <summary>
     /// Get all grid objects inside this grid
@@ -65,6 +73,11 @@ public abstract class GameGrid : MonoBehaviour
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
+
+        if (Input.GetKeyDown(KeyCode.Backspace))
+        {
+            StartCoroutine(RewindState());
+        }
     }
 
     private void FixedUpdate()
@@ -85,8 +98,43 @@ public abstract class GameGrid : MonoBehaviour
     {
         if (GameIsOver) return;
 
+        Debug.Log($"{name} Game is Over");
+
         GameIsOver = true;
         GameOver?.Invoke();
+    }
+
+    public IEnumerator RewindState()
+    {
+        // If stack is empty, dont try to restore state
+        if (previousStateStack.Count == 0) yield break;
+
+        // Get the latest state
+        var states = previousStateStack.Pop();
+
+        // If there were no previous states
+        if (states == null) yield break;
+
+        // Restore all states
+        foreach (var state in states)
+        {
+            state.Restore();
+        }
+
+        yield return new WaitForFixedUpdate();
+
+        foreach (var state in states)
+        {
+            state.RestoreActive();
+        }
+
+        // Remove gameover after rewind
+        if (GameIsOver)
+        {
+            GameIsOver = false;
+            GameOverRewind?.Invoke();
+        }
+
     }
 
     /// <summary>
@@ -95,7 +143,19 @@ public abstract class GameGrid : MonoBehaviour
     public virtual void EndTurn()
     {
         Debug.Log($"{name}: Turn ending");
-        foreach (var obj in GridObjects)
+
+        var objects = GridObjects;
+
+        previousStateStack.Push(objects.Select(o => o.GetState()).ToList());
+
+        // Do players first
+        foreach (var obj in objects.Where(o => o is Player))
+        {
+            obj.OnTurnEnd();
+        }
+
+        // Do non players
+        foreach (var obj in objects.Where(o => !(o is Player)))
         {
             obj.OnTurnEnd();
         }

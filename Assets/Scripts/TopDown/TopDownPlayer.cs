@@ -3,6 +3,17 @@ using UnityEngine;
 
 public class TopDownPlayer : Player
 {
+    public override bool FlagReached { get => FindObjectOfType<TopDownGrid>().FlagReached; set => FindObjectOfType<TopDownGrid>().FlagReached = value; }
+
+    public override void RestoreState(GridObjectState state)
+    {
+        base.RestoreState(state);
+
+        var playerState = (PlayerState)state;
+
+        UpdateFacing(playerState.facingDirection);
+    }
+
     protected override void Update()
     {
         base.Update();
@@ -20,13 +31,13 @@ public class TopDownPlayer : Player
         SetAnimationRow(2);
 
         // Set flag reached
-        FindObjectOfType<TopDownGrid>().FlagReached = true;
+        FlagReached = true;
     }
 
     protected override void SetAnimationRow(int row)
     {
         // Force layer 2 (cheer) if flag has been reached
-        if (FindObjectOfType<TopDownGrid>().FlagReached) row = 2;
+        if (FlagReached) row = 2;
         base.SetAnimationRow(row);
     }
 
@@ -37,10 +48,15 @@ public class TopDownPlayer : Player
         if (nextMove != MoveDirection.None)
         {
             // Reset flag reached when player moves
-            FindObjectOfType<TopDownGrid>().FlagReached = false;
+            FlagReached = false;
         }
 
-        switch (nextMove)
+        UpdateFacing(nextMove);
+    }
+
+    private void UpdateFacing(MoveDirection dir)
+    {
+        switch (dir)
         {
             case MoveDirection.None:
                 break;

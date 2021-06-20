@@ -3,6 +3,39 @@ using UnityEngine;
 
 public class AngryPot : GridObject
 {
+    /// <summary>
+    /// State of the player object
+    /// </summary>
+    public class AngryPotState : GridObjectState
+    {
+        public MoveDirection direction;
+    }
+
+    public override GridObjectState GetState()
+    {
+        // Base state
+        var state = new AngryPotState();
+        base.GetState().CopyTo(state);
+
+        // Pot properties
+        state.direction = direction;
+
+        return state;
+    }
+
+    public override void RestoreState(GridObjectState state)
+    {
+        // Base state
+        base.RestoreState(state);
+
+        // Pot properties
+        var potState = (AngryPotState)state;
+
+        direction = potState.direction;
+
+        UpdateFacing();
+    }
+
     public Renderer potRenderer;
     public MoveDirection direction = MoveDirection.Left;
     private MaterialPropertyBlock block;
@@ -14,21 +47,25 @@ public class AngryPot : GridObject
         block = new MaterialPropertyBlock();
         potRenderer.GetPropertyBlock(block);
 
-        block.SetVector("_BaseMap_ST", new Vector4(-direction.ToVector3().x, 1, 1, 1));
-        potRenderer.SetPropertyBlock(block);
+        UpdateFacing();
     }
 
     public override void OnTurnEnd()
     {
         CheckAndMove();
 
+        UpdateFacing();
+
+        OOBCheck();
+    }
+
+    private void UpdateFacing()
+    {
         if (block != null)
         {
             block.SetVector("_BaseMap_ST", new Vector4(-direction.ToVector3().x, 1, 1, 1));
             potRenderer.SetPropertyBlock(block);
         }
-
-        OOBCheck();
     }
 
     private void CheckAndMove()

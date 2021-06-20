@@ -108,10 +108,14 @@ public abstract class GridObject : MonoBehaviour
     {
         //if (IsMoving) currentTween.Complete();
 
-        // Play falling sound
-        if(reason == DestroyedBy.Fall) AudioPlayer.PlaySoundClip(AudioPlayer.SoundClip.FallCrash);
+        Debug.Log($"{name} was destroyed by {reason}");
 
-        Destroy(gameObject);
+        // Play falling sound
+        if (reason == DestroyedBy.Fall) AudioPlayer.PlaySoundClip(AudioPlayer.SoundClip.FallCrash);
+
+        //Destroy(gameObject);
+        gameObject.SetActive(false);
+
         OnObjectDestroyed.Invoke();
     }
 
@@ -122,6 +126,29 @@ public abstract class GridObject : MonoBehaviour
     public virtual void Push(Vector3 dir, GridObject pusher)
     {
         DoMove(dir);
+    }
+
+    /// <summary>
+    /// Get the state of this object
+    /// </summary>
+    /// <returns></returns>
+    public virtual GridObjectState GetState()
+    {
+        return new GridObjectState
+        {
+            active = gameObject.activeSelf,
+            gridObject = this,
+            position = transform.position
+        };
+    }
+
+    public virtual void RestoreState(GridObjectState state)
+    {
+        // Complete tween if it exists
+        if (IsMoving) currentTween.Complete();
+
+        // First set position to avoid overlap check in OnEnable
+        transform.position = state.position;
     }
 
     /// <summary>
@@ -147,14 +174,14 @@ public abstract class GridObject : MonoBehaviour
         if (!gameObject.activeSelf) return;
 
         // If object cant move down, dont do gravity
-        if (!CanMove(Vector3.down)) return;
+        if (!IsDirectionAllowed(Vector3.down)) return;
 
         // Calculate maximum fall height to do it all in a single move
         int fallLength;
 
         for (fallLength = 1; fallLength < 10; fallLength++)
         {
-            if (!CanMove(Vector3.down * fallLength))
+            if (!IsDirectionAllowed(Vector3.down * fallLength))
             {
                 fallLength--;
                 break;
@@ -221,38 +248,54 @@ public abstract class GridObject : MonoBehaviour
         return canmove;
     }
 
+    public virtual bool IsDirectionAllowed(Vector3 direction) => IsDirectionAllowed(direction, out _);
+
     /// <summary>
-    /// Same as CanMove, but does not push objects
+    /// Same as CanMove, but does not push objects, also gives the objects that are blocking the way (in the same cell)
     /// </summary>
     /// <param name="direction"></param>
     /// <param name="blocker"></param>
     /// <returns></returns>
-    public virtual bool IsDirectionAllowed(Vector3 direction, out GridObject blocker)
+    public virtual bool IsDirectionAllowed(Vector3 direction, out List<GridObject> blockers)
     {
-        blocker = null;
+        blockers = new List<GridObject>();
+
         var ray = new Ray(transform.position, direction);
+        var hits = Physics.RaycastAll(ray, direction.magnitude);
 
-        if (Physics.Raycast(ray, out var hit, direction.magnitude))
+        var canmove = true;
+
+        if (hits.Length > 0)
         {
-            var obj = hit.collider.GetComponent<GridObject>();
-
-            // If there is an object in the way
-            if (obj)
+            foreach (var hit in hits)
             {
-                blocker = obj;
+                var obj = hit.collider.GetComponent<GridObject>();
 
-                // And object can move in this direction
-                if (obj.CanPush(direction))
+                // If there is an object in the way
+                if (obj)
                 {
-                    // Allow movement
-                    return true;
+                    blockers.Add(obj);
+
+                    // And object can move in this direction
+                    if (obj.CanPush(direction))
+                    {
+                        // No pushing
+                    }
+                    else
+                    {
+                        // If object cannot be pushed, dont allow moving here
+                        canmove = false;
+                    }
+                }
+                else
+                {
+                    // Collider wasnt a grid object, it always blocks movement (outer walls etc)
+                    canmove = false;
                 }
             }
-
-            return false;
         }
 
-        return true;
+        return canmove;
     }
 
     /// <summary>
@@ -264,7 +307,8 @@ public abstract class GridObject : MonoBehaviour
         if (IsMoving) currentTween.Complete();
 
         currentTween = transform.DOMove(transform.position + direction, duration);
-        currentTween.OnComplete(MoveFinished);
+
+        if(callback) currentTween.OnComplete(MoveFinished);
 
         // Check if we are out of the world every frame, and stop tween early if so
         currentTween.OnUpdate(() =>

@@ -31,6 +31,9 @@ public class WinUI : MonoBehaviour
         // Check that all grids have reached the flag
         if (grids.Any(g => !g.FlagReached)) return;
 
+        // Clear all rewind stacks
+        foreach (var grid in grids) grid.previousStateStack.Clear();
+
         // Activate winpanel
         WinPanel.SetActive(true);
 
