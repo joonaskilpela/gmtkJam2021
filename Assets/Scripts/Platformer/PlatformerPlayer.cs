@@ -74,7 +74,7 @@ public class PlatformerPlayer : Player
 
     public override void OnTurnEnd()
     {
-        if (nextMove == MoveDirection.None && CanMove(Vector3.down)) nextMove = MoveDirection.Down;
+        if (nextMove == MoveDirection.None) DoGravity();
 
         // If player is jumping
         if (nextMove == MoveDirection.Up)
@@ -108,14 +108,6 @@ public class PlatformerPlayer : Player
         AudioPlayer.PlaySoundClip(AudioPlayer.SoundClip.Jump);
 
         SetAnimationRow(2);
-    }
-
-    public override void DoGravity()
-    {
-        if (CanMove(Vector3.down))
-        {
-            DoMove(Vector3.down);
-        }
     }
 
     protected override void MoveFinished()

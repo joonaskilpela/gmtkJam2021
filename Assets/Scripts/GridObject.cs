@@ -57,16 +57,24 @@ public abstract class GridObject : MonoBehaviour
     }
 
     /// <summary>
-    /// Check if this object is out of bounds
+    /// Check if this object is out of bounds, returns true if object is out of bounds
     /// </summary>
-    public void OOBCheck()
+    /// <returns></returns>
+    public bool OOBCheck()
     {
+        // Skip OOB Check when object is not active
+        if (!gameObject.activeSelf) return false;
+
         if (transform.position.y <= -7)
         {
             Debug.Log($"{name} left the world");
 
             Destroy(DestroyedBy.Fall);
+
+            return true;
         }
+
+        return false;
     }
 
     public enum DestroyedBy
@@ -135,10 +143,25 @@ public abstract class GridObject : MonoBehaviour
     /// </summary>
     public virtual void DoGravity()
     {
-        if (CanMove(Vector3.down))
+        // If object is not active, dont do gravity
+        if (!gameObject.activeSelf) return;
+
+        // If object cant move down, dont do gravity
+        if (!CanMove(Vector3.down)) return;
+
+        // Calculate maximum fall height to do it all in a single move
+        int fallLength;
+
+        for (fallLength = 1; fallLength < 10; fallLength++)
         {
-            DoMove(Vector3.down);
+            if (!CanMove(Vector3.down * fallLength))
+            {
+                fallLength--;
+                break;
+            }
         }
+
+        DoMove(Vector3.down * fallLength, 0.1f * fallLength);
     }
 
 
@@ -242,6 +265,12 @@ public abstract class GridObject : MonoBehaviour
 
         currentTween = transform.DOMove(transform.position + direction, duration);
         currentTween.OnComplete(MoveFinished);
+
+        // Check if we are out of the world every frame, and stop tween early if so
+        currentTween.OnUpdate(() =>
+        {
+            if (OOBCheck()) currentTween.Complete();
+        });
     }
 
     /// <summary>
