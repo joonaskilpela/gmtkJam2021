@@ -4,6 +4,24 @@ public class Crate : GridObject
 {
     private bool destroyAfterMove = false;
     private SpikeTrap destroySpikeAfterMove = null;
+    public GameObject deadPot;
+
+    protected override void OnEnable()
+    {
+        RaycastHit[] hits = Physics.BoxCastAll(transform.position, Vector3.one * 0.1f, Vector3.forward, transform.rotation, 1f);
+
+        foreach (var hit in hits)
+        {
+            var obj = hit.collider.GetComponent<GridObject>();
+
+            // Falling crate smashes angry pot
+            if (obj is AngryPot)
+            {
+                obj.Destroy(DestroyedBy.Crushed);
+                deadPot.SetActive(true);
+            }
+        }
+    }
 
     public override void RestoreState(GridObjectState state)
     {

@@ -63,7 +63,13 @@ MonoBehaviour:
   OnObjectDestroyed:
     m_PersistentCalls:
       m_Calls: []
+  OnMoveFinished:
+    m_PersistentCalls:
+      m_Calls: []
+  upTexture: {fileID: 2800000, guid: f2c2e53ffcc5eb64ebbdba0342d6248f, type: 3}
+  downTexture: {fileID: 2800000, guid: ed6bbc0b05c68ff438d036c26a4420a1, type: 3}
   potRenderer: {fileID: 1658165390248800565}
+  direction: 4
 --- !u!1 &3615086259982113695
 GameObject:
   m_ObjectHideFlags: 0

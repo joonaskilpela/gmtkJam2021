@@ -3,6 +3,9 @@ using UnityEngine;
 
 public class AngryPot : GridObject
 {
+    public Texture upTexture;
+    public Texture downTexture;
+
     /// <summary>
     /// State of the player object
     /// </summary>
@@ -63,7 +66,15 @@ public class AngryPot : GridObject
     {
         if (block != null)
         {
-            block.SetVector("_BaseMap_ST", new Vector4(-direction.ToVector3().x, 1, 1, 1));
+            if (direction == MoveDirection.Up)
+                GetComponentInChildren<Renderer>().material.SetTexture("_BaseMap", upTexture);
+
+            else if (direction == MoveDirection.Down)
+                GetComponentInChildren<Renderer>().material.SetTexture("_BaseMap", downTexture);
+
+            else
+                block.SetVector("_BaseMap_ST", new Vector4(-direction.ToVector3().x, 1, 1, 1));
+
             potRenderer.SetPropertyBlock(block);
         }
     }
