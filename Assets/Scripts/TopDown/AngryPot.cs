@@ -1,16 +1,20 @@
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class AngryPot : GridObject
 {
     public Texture upTexture;
     public Texture downTexture;
+    public bool destroyed = false;
+    public UnityEvent RewindDestroyed;
 
     /// <summary>
     /// State of the player object
     /// </summary>
     public class AngryPotState : GridObjectState
     {
+        public bool destroyed;
         public MoveDirection direction;
     }
 
@@ -22,6 +26,7 @@ public class AngryPot : GridObject
 
         // Pot properties
         state.direction = direction;
+        state.destroyed = destroyed;
 
         return state;
     }
@@ -33,6 +38,22 @@ public class AngryPot : GridObject
 
         // Pot properties
         var potState = (AngryPotState)state;
+
+        // If state destroyed differs from current state
+        if (potState.destroyed != destroyed)
+        {
+            // State is destroyed, remove pot
+            if (potState.destroyed)
+            {
+                Destroy(DestroyedBy.Removal);
+            }
+            else // State is not destroyed, rewind destroyed state
+            {
+                RewindDestroyed?.Invoke();
+            }
+        }
+
+        destroyed = potState.destroyed;
 
         direction = potState.direction;
 
@@ -55,6 +76,9 @@ public class AngryPot : GridObject
 
     public override void OnTurnEnd()
     {
+        if (destroyed)
+            return;
+
         CheckAndMove();
 
         UpdateFacing();
@@ -67,10 +91,10 @@ public class AngryPot : GridObject
         if (block != null)
         {
             if (direction == MoveDirection.Up)
-                GetComponentInChildren<Renderer>().material.SetTexture("_BaseMap", upTexture);
+                block.SetTexture("_BaseMap", upTexture);
 
             else if (direction == MoveDirection.Down)
-                GetComponentInChildren<Renderer>().material.SetTexture("_BaseMap", downTexture);
+                block.SetTexture("_BaseMap", downTexture);
 
             else
                 block.SetVector("_BaseMap_ST", new Vector4(-direction.ToVector3().x, 1, 1, 1));
@@ -81,6 +105,9 @@ public class AngryPot : GridObject
 
     private void CheckAndMove()
     {
+        if (destroyed)
+            return;
+
         Vector3 dir = direction.ToVector3();
 
         if (CanMove(dir, out var blockers))
@@ -104,7 +131,12 @@ public class AngryPot : GridObject
             }
 
             direction = direction.Opposite();
-            CheckAndMove();
+
+            dir = direction.ToVector3();
+            if (CanMove(dir))
+            {
+                CheckAndMove();
+            }
 
             return;
         }
@@ -119,7 +151,7 @@ public class AngryPot : GridObject
         if (direction.Opposite() == moveDirection) return false;
 
         // If pot is changing direction
-        if(!IsDirectionAllowed(direction.ToVector3()))
+        if (!IsDirectionAllowed(direction.ToVector3()))
         {
             // If move was in the same direction (towards the obstacle that we are going to change direction on)
             if (direction == moveDirection) return false;
@@ -129,5 +161,28 @@ public class AngryPot : GridObject
         if (other.HasGravity && other.transform.position.y > transform.position.y) return false;
 
         return true;
+    }
+
+    public override void Destroy(DestroyedBy reason)
+    {
+        destroyed = true;
+
+        Debug.Log($"{name} was destroyed by {reason}");
+
+        // Play falling sound
+        if (reason == DestroyedBy.Fall) AudioPlayer.PlaySoundClip(AudioPlayer.SoundClip.FallCrash);
+
+        //Destroy(gameObject);
+        //gameObject.SetActive(false);        
+
+        OnObjectDestroyed.Invoke();
+    }
+
+    public override void DoGravity()
+    {
+        if (destroyed)
+            return;
+
+        base.DoGravity();
     }
 }

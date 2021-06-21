@@ -78,7 +78,7 @@ public abstract class GameGrid : MonoBehaviour
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
 
-        if (Input.GetKeyDown(KeyCode.Backspace))
+        if (Input.GetKeyDown(KeyCode.Backspace) ||Input.GetKeyDown(KeyCode.Z))
         {
             StartCoroutine(RewindState());
         }

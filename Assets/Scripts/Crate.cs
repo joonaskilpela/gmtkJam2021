@@ -4,7 +4,6 @@ public class Crate : GridObject
 {
     private bool destroyAfterMove = false;
     private SpikeTrap destroySpikeAfterMove = null;
-    public GameObject deadPot;
 
     protected override void OnEnable()
     {
@@ -18,7 +17,6 @@ public class Crate : GridObject
             if (obj is AngryPot)
             {
                 obj.Destroy(DestroyedBy.Crushed);
-                deadPot.SetActive(true);
             }
         }
     }
