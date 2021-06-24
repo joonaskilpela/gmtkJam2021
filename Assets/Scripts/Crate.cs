@@ -18,6 +18,10 @@ public class Crate : GridObject
             {
                 obj.Destroy(DestroyedBy.Crushed);
             }
+            else if(obj is Player)
+            {
+                obj.Destroy(DestroyedBy.Crushed);
+            }
         }
     }
 

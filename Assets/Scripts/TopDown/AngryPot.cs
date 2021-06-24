@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
@@ -109,8 +110,9 @@ public class AngryPot : GridObject
             return;
 
         Vector3 dir = direction.ToVector3();
+        List<GridObject> blockers = new List<GridObject>();
 
-        if (CanMove(dir, out var blockers))
+        if (CanMove(dir, out blockers))
         {
             DoMove(dir);
             return;
@@ -133,10 +135,16 @@ public class AngryPot : GridObject
             direction = direction.Opposite();
 
             dir = direction.ToVector3();
-            if (CanMove(dir))
+            if (CanMove(dir, out blockers))
             {
                 CheckAndMove();
             }
+            else if (blockers.Any(o => o is Player))
+            {
+                CheckAndMove();
+            }
+            else
+                DoGravity();
 
             return;
         }
@@ -160,6 +168,10 @@ public class AngryPot : GridObject
         // If other has gravity, and is above (riding)
         if (other.HasGravity && other.transform.position.y > transform.position.y) return false;
 
+        // If pot is stuck above player, player can't jump above it
+        if(!IsDirectionAllowed(direction.ToVector3()) && !IsDirectionAllowed(direction.Opposite().ToVector3())){
+            return false;
+        }
         return true;
     }
 

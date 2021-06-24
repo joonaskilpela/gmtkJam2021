@@ -197,6 +197,15 @@ public abstract class GridObject : MonoBehaviour
                 // Stop fall short here
                 break;
             }
+            if (blockers.Any(o => o is Goal))
+                break;
+            // If we ran into anything
+            if(blockers.Count > 0)
+            {
+                // Stop fall short here
+                fallLength--;
+                break;
+            }
         }
 
         DoMove(Vector3.down * fallLength, 0.1f * fallLength);

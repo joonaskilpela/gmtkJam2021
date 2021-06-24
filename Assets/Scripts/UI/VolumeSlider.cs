@@ -7,7 +7,7 @@ public class VolumeSlider : MonoBehaviour
     public AudioMixerGroup masterGroup;
     public Slider audioSlider;
 
-    public void OnEnable()
+    public void Start()
     {
         audioSlider.value = PlayerPrefs.GetFloat("Volume", 1f);
 
